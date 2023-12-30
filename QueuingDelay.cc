@@ -5,6 +5,12 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/netanim-module.h"
 
+// includes as per use cases....
+#include <iostream>
+#include <fstream>
+
+// Purpose of this file:
+// This is code for observing the queuing delay in configuration given below
 // Default Network Topology
 //
 //(C)   54.0.0.0/8    55.0.0.0/8   (S)
@@ -20,6 +26,8 @@ int queueCounter = 0;
 int packetCounterEnQ = 0;
 int packetCounterDeQ = 0;
 
+std::ofstream enq,deq,mainF;
+
 void HenilEnQ(std::string ctx, Ptr<const Packet> pkt)
 {
 	std::cout 
@@ -33,7 +41,27 @@ void HenilEnQ(std::string ctx, Ptr<const Packet> pkt)
 		<< " , " 
 		<< "enq" 
 		<< std::endl;
-
+	/*string data = to_string(packetCounterEnQ)
+		      + " " 
+		      + to_string(Time(Simulator::Now()).GetNanoSeconds())
+		      + " "
+		      + to_string(queueCounter);*/
+	enq << packetCounterEnQ
+	    << ","
+	    << Time(Simulator::Now()).GetNanoSeconds()
+	    << ","
+	    << queueCounter
+	    << std::endl;
+	    
+	
+	mainF << packetCounterEnQ
+	    << ","
+	    << Time(Simulator::Now()).GetNanoSeconds()
+	    << ","
+	    << queueCounter
+	    << ","
+	    << "AenQ"
+	    << std::endl;
 }
 
 void HenilDeQ(std::string ctx, Ptr<const Packet> pkt)
@@ -49,14 +77,41 @@ void HenilDeQ(std::string ctx, Ptr<const Packet> pkt)
 		<< " , " 
 		<< "deq" 
 		<< std::endl;
+		
+	/*string data = to_string(packetCounterDeQ)
+		      + " " 
+		      + to_string(Time(Simulator::Now()).GetNanoSeconds())
+		      + " "
+		      + to_string(queueCounter);*/
+	
+	deq << packetCounterDeQ
+	    << ","
+	    << Time(Simulator::Now()).GetNanoSeconds()
+	    << ","
+	    << queueCounter
+	    << std::endl;		    	
+	
+	mainF << packetCounterDeQ
+	    << ","
+	    << Time(Simulator::Now()).GetNanoSeconds()
+	    << ","
+	    << queueCounter
+	    << ","
+	    << "BdeQ"
+	    << std::endl;
 }
 
 int
 main(int argc, char* argv[])
 {
+        
     CommandLine cmd(__FILE__);
     cmd.Parse(argc, argv);
-
+    
+    enq.open("Henil_EnQ.txt");
+    deq.open("Henil_DeQ.txt");
+    mainF.open("Henil_Main.txt");
+    
     Time::SetResolution(Time::NS);
     // LogComponentEnable("UdpEchoClientApplication", LOG_LEVEL_INFO);
     // LogComponentEnable("UdpEchoServerApplication", LOG_LEVEL_INFO);
@@ -75,7 +130,7 @@ main(int argc, char* argv[])
     p2pHigh.SetDeviceAttribute("DataRate", StringValue("500Mbps"));
     p2pHigh.SetChannelAttribute("Delay", StringValue("2ms"));
     // This link, with low data rate and high delay...
-    p2pLow.SetDeviceAttribute("DataRate", StringValue("5Mbps"));
+    p2pLow.SetDeviceAttribute("DataRate", StringValue("5Kbps"));
     p2pLow.SetChannelAttribute("Delay", StringValue("20ms"));
     
     // creating devices here =======================================
@@ -104,7 +159,7 @@ main(int argc, char* argv[])
     
     // client configuration here ===================================
     UdpEchoClientHelper echoClient(interfaces12.GetAddress(1), 9);
-    echoClient.SetAttribute("MaxPackets", UintegerValue(10));
+    echoClient.SetAttribute("MaxPackets", UintegerValue(1000));
     echoClient.SetAttribute("Interval", TimeValue(Seconds(0.001)));
     echoClient.SetAttribute("PacketSize", UintegerValue(1024));
 

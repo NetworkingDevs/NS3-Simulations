@@ -7,6 +7,7 @@
 #include "ns3/point-to-point-module.h"
 #include "ns3/netanim-module.h"
 
+// Purpose of this file:
 // Testing 01 : P2P - CSMA - P2P
 
 using namespace ns3;
