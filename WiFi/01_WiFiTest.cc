@@ -1,3 +1,8 @@
+// The purpose of this file :
+// This is base file for learning WiFi nodes configuration in NS3
+// This file is available at "examples/tutorials/"
+// It is (third.cc) file
+
 // comparing with second.cc
 #include "ns3/applications-module.h"
 #include "ns3/core-module.h"
