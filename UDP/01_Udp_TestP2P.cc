@@ -1,13 +1,12 @@
 // The purpose of this file :
 // This is very basic P2P connection 
-// where server and client is commnicating using TCP Protocol
+// where server and client is commnicating using UDP Protocol
 #include "ns3/core-module.h"
 #include "ns3/network-module.h"
 #include "ns3/internet-module.h"
 #include "ns3/point-to-point-module.h"
 #include "ns3/applications-module.h"
 #include "ns3/netanim-module.h"
-#include "ns3/tcp-module.h"
 
 using namespace ns3;
 
@@ -15,8 +14,6 @@ int main (int argc, char *argv[])
 {
   // Enable logging
   LogComponentEnable("TcpHeader", LOG_LEVEL_INFO);
-  LogComponentEnable("TcpCongestionOps", LOG_LEVEL_INFO);
-  LogComponentEnable("TcpSocketBase", LOG_LEVEL_INFO);
 
   // Create nodes
   NodeContainer nodes;
@@ -41,15 +38,13 @@ int main (int argc, char *argv[])
 
   // Create a TCP sink application on node 1
   Address sinkAddress(InetSocketAddress(interfaces.GetAddress(1), 8080));
-  PacketSinkHelper packetSinkHelper("ns3::TcpSocketFactory", sinkAddress);
+  PacketSinkHelper packetSinkHelper("ns3::UdpSocketFactory", sinkAddress);
   ApplicationContainer sinkApps = packetSinkHelper.Install(nodes.Get(1));
   sinkApps.Start(Seconds(0.0));
   sinkApps.Stop(Seconds(10.0));
-  
-  Config::SetDefault("ns3::TcpSocket::InitialCwnd", UintegerValue(1));
 
   // Create a TCP client application on node 0
-  OnOffHelper onoff("ns3::TcpSocketFactory", sinkAddress);
+  OnOffHelper onoff("ns3::UdpSocketFactory", sinkAddress);
   onoff.SetAttribute("OnTime", StringValue("ns3::ConstantRandomVariable[Constant=1]"));
   onoff.SetAttribute("OffTime", StringValue("ns3::ConstantRandomVariable[Constant=0]"));
   onoff.SetAttribute("PacketSize", UintegerValue(1500));
@@ -60,9 +55,9 @@ int main (int argc, char *argv[])
   clientApps.Stop(Seconds(10.0));
 
   // Enable PCAP tracing
-  pointToPoint.EnablePcapAll("tcp-example");
+  pointToPoint.EnablePcapAll("udp-example");
   
-  AnimationInterface anim("HenilTcp.xml");
+  AnimationInterface anim("HenilUdp.xml");
 
   // Run the simulation
   Simulator::Run();
