@@ -57,6 +57,8 @@ main(int argc, char* argv[])
     anim.SetConstantPosition(nodes.Get(1), 20, 10);
     anim.SetConstantPosition(nodes.Get(2), 30, 10);
 
+    csmaChannel.EnablePcapAll("basic_arp");
+
     Simulator::Stop(Seconds(30.0));
     Simulator::Run();
     Simulator::Destroy();
