@@ -38,6 +38,27 @@
 
 using namespace ns3;
 
+void printIpAddress(NodeContainer nodes) {
+    for (uint32_t i= 0; i<nodes.GetN(); ++i) {
+        Ptr<Node> node = nodes.Get(i);
+        Ptr<Ipv4> ipv4 = node->GetObject<Ipv4>();
+
+        std::cout << "Node " << i << " IP Configuration: \n";
+
+        for (uint32_t j=0; j<ipv4->GetNInterfaces(); ++j) {
+            for (uint32_t k=0; k<ipv4->GetNAddresses(j); ++k) {
+                Ipv4InterfaceAddress iaddr = ipv4->GetAddress(j, k);
+                std::cout << " Interface " << j
+                          << " IP: " << iaddr.GetLocal()
+                          << " Mask: " << iaddr.GetMask()
+                          << std::endl;
+            }
+        }
+
+        std::cout << "----------------------------------------------\n";
+    }
+}
+
 int
 main(int argc, char* argv[]) {
 
@@ -101,10 +122,16 @@ main(int argc, char* argv[]) {
     DhcpHelper dhcpHelper;
 
     // DHCP Server
+    /**
+     * Node Pointer, DHCP Server's Address,
+     * Pool's Network ID, Pool's Subnet Mask,
+     * Pool's Start IP (Min.IP), Pool's End IP (Max.IP), // scope of DHCP Server
+     * Pool's G/W Address
+     */
     ApplicationContainer dhcpServerApp = dhcpHelper.InstallDhcpServer(
         allDevices.Get(0), Ipv4Address("192.168.10.1"),
         Ipv4Address("192.168.10.0"), Ipv4Mask("/24"),
-        Ipv4Address("192.168.10.2"), Ipv4Address("192.168.10.20"),
+        Ipv4Address("192.168.10.2"), Ipv4Address("192.168.10.3"),
         Ipv4Address("192.168.10.1")
     );
     dhcpServerApp.Start(Seconds(0));
@@ -141,11 +168,12 @@ main(int argc, char* argv[]) {
     app.Start(Seconds(15.0));
     app.Stop(Seconds(30.0));
 
-    
+
     /**
      * Step-7: Simulation Configuration(s)
      */
     Simulator::Stop(Seconds(60));
+    Simulator::Schedule(Seconds(30), &printIpAddress, allNodes);
 
     if (tracing) {
         csma.EnablePcapAll("dhcp-simulation-node");
