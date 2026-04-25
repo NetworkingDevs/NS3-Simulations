@@ -1,7 +1,8 @@
 /**
  * This file is simple simulation of DHCP. Where you have only
  * one DHCP Server and only one DHCP Client in same local net-
- * work.
+ * work. Total Number of DHCP Clients can be modified at runt-
+ * ime using command line arguments.
  * 
  * Reference: /src/internet-apps/examples/dhcp-example.cc
  * 
